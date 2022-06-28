@@ -4,25 +4,29 @@ onload = function(){
             id : 1,
             collage : "nsit",
             total_seat : 0,
-            seat_available : 0
+            seat_available : 0,
+            cut_off : 100
         },
         {
             id : 2,
             collage : "dtu",
             total_seat : 0,
-            seat_available : 0
+            seat_available : 0,
+            cut_off : 100
         },
         {
             id : 3,
             collage : "iiit",
             total_seat : 0,
-            seat_available : 0
+            seat_available : 0,
+            cut_off : 100
         },
         {
             id : 4,
             collage : "igdtu",
             total_seat : 0,
-            seat_available : 0
+            seat_available : 0,
+            cut_off : 100
         }
     ];
     for(let i=0;i<collages.length;i++){
@@ -59,7 +63,13 @@ onload = function(){
     }
 
     //sorting compare return negative 1st will be 1st, return positive 2nd will be 1st, return 0 no change 
-    students.sort(function(stud1,stud2){return stud2.percentage-stud1.percentage});
+    students.sort(function(stud1,stud2){
+        if(stud2.percentage==stud1.percentage){
+            if(stud1.name>=stud2.name)return 0;
+            else return -1;
+        }
+        return stud2.percentage-stud1.percentage;
+    });
 
 
     let table = document.getElementById("myTable");
@@ -74,17 +84,39 @@ onload = function(){
                 collages[students[i].perference[j].collage_index].seat_available--;
                 students[i].allotated_collage.status = true;
                 students[i].allotated_collage.collage = collages[students[i].perference[j].collage_index].collage;
+                collages[students[i].perference[j].collage_index].cut_off=students[i].percentage;
                 // console.log(students[i]);
                 break;
             }
         }
+        // console.log(students[i].perference);
+        let perference = collages[students[i].perference[0].collage_index].collage;
+
+        for(let j=1 ;j<students[i].perference.length ;j++){
+            perference+=", " + collages[students[i].perference[j].collage_index].collage;
+        }
+
+        // console.log(perference);
         let cell = table.insertRow();
         cell.innerHTML = `
         <th>${students[i].name}</th>
-        <th>${students[i].allotated_collage.status}</th>
+        <th>${perference}</th>
         <th>${students[i].allotated_collage.collage}</th>
         <th>${students[i].percentage}</th>
         `;
+    }
+
+    let collage_detail = document.getElementById("collage_detail");
+    for(let i=0 ; i < collages.length ; i++){
+        let detail = document.createElement("div");
+        detail.innerHTML = `
+            <h3>collage Name : ${collages[i].collage}</h3>
+            <p>CutOff Percentage : ${collages[i].cut_off}</p>
+            <p>Total Seat : ${collages[i].total_seat}</p>
+            <p>Seat Alloted : ${collages[i].total_seat-collages[i].seat_available}</p>
+            <p>Seat Available : ${collages[i].seat_available}</p>
+        `;
+        collage_detail.appendChild(detail);
     }
 }
 
